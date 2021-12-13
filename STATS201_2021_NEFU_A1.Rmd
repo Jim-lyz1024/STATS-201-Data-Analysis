@@ -1,0 +1,265 @@
+---
+title: "STATS 201 Assignment 1"
+author: "LiYuzhuo-2019210146"
+date: 'Due Date: 10/10/2021'
+output:
+  word_document: default
+  pdf_document: default
+  html_document:
+    fig_caption: yes
+    number_sections: yes
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.height=3)
+```
+```{r echo=FALSE}
+## Do not delete this!
+## It loads the s20x library for you. If you delete it 
+## your document may not compile
+require(s20x)
+```
+
+
+# Question 1
+
+
+# Question of interest/goal of the study
+
+We are interested in using a country's gross domestic product to predict the amount of electricity that they use.
+
+# Read in and inspect the data:
+```{r,fig.height=4,fig.width=6}
+elec.df<-read.csv("electricity.csv")
+plot(Electricity~GDP, data=elec.df)
+
+```
+
+It seems to be a positive linear relationship between the GDP of a country and amount of electricity that they use. There are two observations with its responses are much greater than the rest of the data. These points probably have a big influence on the overall fit.
+
+# Fit an appropriate linear model, including model checks.
+```{r,fig.height=4,fig.width=6}
+elecfit1=lm(Electricity~GDP,data=elec.df)
+plot(elecfit1,which=1)
+normcheck(elecfit1)
+cooks20x(elecfit1)
+```
+
+# Identify the two countries with GDP greater than 6000. 
+```{r,fig.height=4,fig.width=6}
+# could use some R code to do this
+high <- subset(elec.df, GDP > 6000)
+high
+```
+
+The two countries with GDP Greater than 6000 are China and the United States.
+
+
+# Replot data eliminating countries with GDP greater than 6000. 
+```{r,fig.height=4,fig.width=6}
+# Hint: If you want to limit the range of the data, do so in the data statement. E.G. something similar to data=elec.df[elec.df$GDP>2000,]
+data <- elec.df[elec.df$GDP<6000,]
+plot(Electricity~GDP, data=data)
+```
+
+There still appears to be a positive linear relationship between the GDP of a country and amount of electricity that they use. In this plot, our fitted becomes better, and obviously the strength of the linear relation has gotten stronger.
+
+
+
+# Fit a more appropriate linear model, including model checks.
+```{r,fig.height=4,fig.width=6}
+elecfit2 <- lm(Electricity~GDP,data=data)
+plot(elecfit2,which=1)
+normcheck(elecfit2)
+cooks20x(elecfit2)
+summary(elecfit2)
+confint(elecfit2)
+
+
+```
+
+
+# Create a scatter plot with the fitted line from your model superimposed over it. 
+```{r,fig.height=4,fig.width=6}
+plot(Electricity~GDP, data=data)
+coef(elecfit2)
+abline(coef(elecfit2),col='red')
+
+
+```
+
+
+# Method and Assumption Checks
+Since we have a linear relationship in the data, we have fitted a simple linear regression model to our data. We have 28 of the most populous countries, but have no information on how these were obtained. As the method of sampling is not detailed, there  could be doubts about independence. These are likely to be minor, with a bigger concern being how representative the data is of a wider group of countries. The initial residuals and Cooks plot showed two distinct outliers (USA and China) who had vastly higher GDP than all other countries and therefore could be following a totally different pattern so we limited our analysis to countries with GDP under 6000 (billion dollars). After this, the residuals show patternless scatter with fairly constant variability - so no problems. The normaility checks don't show any major problems (slightly long tails, if anything) and the Cook's plot doesn't reveal any further unduly influential points. Overall, all the model assumptions are satisfied. 
+
+Our model is:
+$Electricity_i =\beta_0 +\beta_1\times GDP_i +\epsilon_i$ where $\epsilon_i \sim iid ~ N(0,\sigma^2)$ 
+
+Our model explains 93% of the total variation in the response variable, and so will be reasonable for prediction.
+
+
+# Executive Summary
+
+The purpose of this analysis was to investigate the relationship between electricity consumption and the gross domestic product (GDP) for countries of the world. Information was obtained for a selection of 28 of the most populous countries in the world. Of these 28 countries, China and the United States are excluded because they are regarded as outliers.
+
+We found from our analysis that there exists a positive linear relationship between the GDP of a country and amount of electricity that they use, as $(p \approx 0)$. 
+
+The relationship has Residual standard error 54.64 on 24 degrees of freedom. And with 95% confidence we estimate that on average, for every 1 billion dollar increase in GDP there is between 0.168 to 0.211kWh increase in electricity consumption. As Adjusted R-squared is 0.9294, our fitted model is very accurate.
+
+
+# Predict the electricity usage for a country with GDP 1000 billion dollars. 
+```{r}
+predict(elecfit2, newdata = data.frame('GDP'=1000), interval = 'prediction')
+
+
+
+```
+
+# Interpret the prediction and comment on how useful it is.
+
+The prediction says that a country with GDP of 1000 billion dollars will consume between 76.3 to 306.2kWh of electricity, with a mean consumption 191.2kWh. 
+
+Our model has explained nearly 93% of the variability in electricity consumption, so it is really good. The prediction interval accounts for about 29% of the original data range of 800kwh - which is quite good. However, from the perspective of the prediction range, our prediction of power consumption in countries with GDP far below 1000 billion maybe be wrong, because the lower limit of the prediction range will become negative. But in a word, for the most of the countries, our model is quite useful as a prediction.
+
+
+
+****
+
+# Question 2
+
+# Question of interest/goal of the study
+We are interested in estimating the mean life expectancy of people in the world and seeing if the data is consistant with a mean value of 68 years.
+
+
+## Read in and inspect the data:
+```{r,fig.height=3.5}
+Life.df=read.csv("countries.csv",header=T)
+hist(Life.df$Life)
+summary(Life.df$Life)
+```
+
+From the histogram of life expectancy, it seems that the average life expectancy of each country meets the normal distribution and is centered on the average age about 70 years. It also shows that life expectancy in a few countries is much lower than the average life expectancy. Result of the summary shows that the median and average life expectancy are also very similar, 72.9 and 69.8 years respectively. 
+
+
+
+## Manually calculate the t-statistic and the corresponding 95\% confidence interval. 
+Formula: $T = \frac{\bar{y}-\mu_0}{se(\bar{y})}$ and 95\% confidence interval $\bar{y} \pm t_{df,0.975} \times se(\bar{y})$
+
+NOTES: The R code ```mean(y)``` calculates $\bar{y}$, ```sd(y)``` calculates $s$, the standard deviation of $y$, and the degrees of freedom, $df = n-1$. The standard error, $se(\bar{y}) = \frac{s}{\sqrt{n}}$ and ```qt(0.975,df)``` gives the $t_{df,0.975}$ multiplier.   
+
+
+```{r}
+sample.mean <- mean(Life.df$Life)
+sample.sd <- sd(Life.df$Life)
+sample.n <- length(Life.df$Life)
+t.mult <- qt(1-0.05/2, df = sample.n-1)
+CI.life <- sample.mean + t.mult * c(-1, 1) * sample.sd/sqrt(sample.n)
+sample.se <- sample.sd/sqrt(sample.n)
+t.stat <- (sample.mean - 68)/sample.se
+p.value <- 2*(1-pt(abs(t.stat), df = sample.n - 1))
+c('sample mean'=sample.mean,'sample sd'=sample.sd,'sample size'=sample.n)
+c('standard error' = sample.se,'t value'=t.stat,'p value'=p.value)
+
+
+```
+
+##  Using the t.test function
+```{r}
+t.test(Life.df$Life, mu=68)
+```
+
+
+**Note:** 
+You should get exactly the same results from the manual calculations and using the $t.test$ function. Doing this was to give you practice using some R code.
+
+## Fit a null model 
+```{r}
+lifefit1=lm(Life~1,data=Life.df)
+normcheck(lifefit1)
+cooks20x(lifefit1)
+summary(lifefit1);
+confint(lifefit1)
+```
+
+# Why are the P-values from the t-test output and null linear model different?
+
+The null model compares the estimated average life expectancy (69.8 years) with the average life expectancy of 0 years. It is reasonable that the p value is basically 0, because if the real life expectancy is actually 0 years, it is impossible to get our estimated 69.8 years.
+
+The t-test compares the estimated average life expectancy (69.8 years) with the assumed average life expectancy (68 years). The p value is much larger, because even if the average life expectancy we assume is indeed the real population average, we can actually get our estimate due to the random error in the sample.
+
+
+# Method and Assumption Checks
+
+As the data consists of one measurement - the life expectancy for each country - we have applied a one sample t-test to it, equivalent to an intercept only linear model (null model).
+
+We have a random sample of 55 countries so we can assume they form an independent and representative sample. We wished to estimate their average life expectancy and compare it to 68 years. Checking the normality of the differences reveals the data is moderately left skewed. However, we have a large sample size of 55 and can appeal to the Central Limit Theorem for the distribution of the sample mean, so are not concerned. There were no unduly influential points.
+
+Our model is:
+$Life_i = \mu_{Life} + \epsilon_i$ where $\epsilon_i \sim iid ~ N(0,\sigma^2)$ 
+
+# Executive Summary 
+The purpose of this analysis was to see whether the average life expectancy among countries of the world is about 68 years. A sample of 55 countries was randomly selected.
+
+We didn't find evidence against the null hypothesis through the analysis $(p \approx 0.158)$. So we agree that the mean life expectancy of countries in the world is 68 years old. Our 95% confidence interval for this given sample ranges from 67.3 to 72.3 years. Therefore, we can conclude that 68 years old may be the real average life expectancy of all countries in the world.
+
+
+****
+
+# Question 3
+
+
+# Question of interest/goal of the study
+We are interested in investigate the relationship between the age of the house and the sale price of a house in the city Eugene in the state of Oregon, USA.
+
+
+## Read in and inspect the data:
+```{r,fig.height=3.5,fig.width=6}
+home.df=read.csv("homes.csv",header=T)
+plot(Price~Age,data=home.df)
+trendscatter(Price~Age,data=home.df)
+```
+
+The data does not follow a simple linear trend, it seems like a quadratic functional relationship instead, so a quadratic model can be used to fit this data.
+
+
+## Fit an appropriate linear model, including model checks.
+
+```{r,fig.height=3.5,fig.width=6}
+homefit <- lm(Price~Age + I(Age^2), data=home.df)
+plot(homefit,which=1)
+normcheck(homefit)
+cooks20x(homefit)
+summary(homefit)
+confint(homefit)
+```
+
+## Plot the data with your appropriate model superimposed over it.
+```{r,fig.height=3.5,fig.width=6}
+preds <- predict(homefit, data.frame("Age"=0:100), interval = "prediction")
+plot(Price ~ Age,data=home.df)
+lines(0:100, preds[,'fit'], col="red")
+```
+
+
+# Method and Assumption Checks
+A quadratic linear model was fitted as the data seemed to follow a curved trend. The 76 single-family houses were chosen randomly, so we regard each data is independent. The initial trendscatter plot for the simple linear model showed fairly constant and patternless scatter, but the dataset followed a curved trend so a quadratic linear model was fitted. The residuals show patternless scatter with fairly constant variability - so no problems, except for a slight negative deviation on the left end of the graph. Although this deviation is a cause for some concern it is fairly moderate and the rest of the mean residuals are near constant around 0, so we have chosen to tolerate it. The normaility checks don’t show any major problems and the Cook’s plot doesn’t reveal any further unduly influential points. Overall, all the model assumptions are satisfied.
+
+Our model is: $Price = \beta_0 + \beta_1 \times Age + \beta_2 \times Age^2 + \epsilon_i$ where $\epsilon_i \sim iid ~ N(0,\sigma^2)$.
+
+As Adjusted R-squared is 0.1235, so our model only explains 12.4% total variation in the response variable, it has low predictive power.
+
+# Executive Summary
+The purpose of this analysis was to investigate the relationship between the age of the house and the sale price of a house. We have found there to be a  quadratic relationship between the age of a house and its sale price ($p<0.05$). As Adjusted R-squared is 0.1235, our fitted model is not very accurate.
+
+
+
+
+
+
+
+
+
+
+
+
+
