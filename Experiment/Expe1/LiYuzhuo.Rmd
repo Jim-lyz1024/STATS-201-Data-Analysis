@@ -1,0 +1,59 @@
+---
+title: "STATS 201 Lab Class 1"
+author: LiYuzhuo-2019210146
+output:
+  word_document: default
+  pdf_document: default
+---
+\large
+
+#Gravity experiment
+
+# Code and output
+
+```{r}
+library(s20x)
+Gravity.df = read.table("GravityExpt.txt", header = TRUE)
+
+## Plot the data.
+plot(Height~Time, data=Gravity.df)
+
+## Analyse the data.
+timefit=lm(Height~Time + I(Time^2), data=Gravity.df)
+plot(timefit,which=1)
+normcheck(timefit)
+cooks20x(timefit)
+
+## Answer research questions.
+summary(timefit)
+confint(timefit)
+```
+
+# Methods and Assumption Checks
+
+We fitted	a	linear model with	quadratic term the relationship between height and time is quadratic.	
+
+After	fitting	the quadratic,the	residuals	were fine, Our data do not strictly follow a normal distribution, but the impact on the overall effect is not significant, and there are no unduly influential	points. We have independence from taking a random	sample.
+
+Our model is: $Height = \beta_0 + \beta_1 \times Time + \beta_2 \times Time^2 + \epsilon_i$ where $\epsilon_i \sim iid ~ N(0,\sigma^2)$.
+
+As Adjusted R-squared is 0.0.9942, so our model explains 99.42% total variation in the response variable, which shows the model fitted to the data is very well. 
+
+# Executive Summary
+It was of interest to model the relationship between the height of the ball in meters and times after ejection of the steel ball.
+
+We found strong evidence suggesting there is a quadratic relationship between height of the ball and time after ejection($p \approx 0$). 
+
+As the coefficient of the quadratic term is -0.5g, so we can concluded from the summary part, the estimated value of g is 9.74.
+
+Our 95% confidence interval for estimated value of g ranges from 9.46 to 10.04, which included the theoretical value of 9.80.
+
+As for the intercept term, we found the p-value of the intercept term is 0.991, which is not small enough to against the null assumption, shows that the intercept term in our analysis is zero. So we can concluded that our analysis is consistent with the true value of the coefficient of the intercept term.  
+
+
+
+
+
+
+
+

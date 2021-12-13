@@ -1,0 +1,72 @@
+---
+title: "STATS 201 Lab Class 3"
+author: LiYuzhuo-2019210146
+output:
+  word_document: default
+  pdf_document: default
+---
+\large
+
+# Pizza size
+
+# Code and output
+
+```{r}
+require(s20x)
+## Loading in the data.
+pizza.df = read.table(file = "pizza.txt", header = TRUE)
+
+pizza.df$store = as.factor(pizza.df$store)
+pizza.df$crust = as.factor(pizza.df$crust)
+
+## Plot the data.
+interactionPlots(size ~ store + crust, pizza.df)
+
+## Analyse the data.
+size.fit = lm(size ~ store * crust, pizza.df)
+eovcheck(size.fit)
+normcheck(size.fit)
+cooks20x(size.fit)
+summary(size.fit)
+anova(size.fit)
+
+summary2way(size.fit, page = "interaction")
+
+```
+
+# Methods and Assumption Checks
+  We have two explanatory factors, store and crust, and one numeric response size. The interaction plot indicated different slopes between the levels. So we fitted a two-way ANOVA model with interaction between store and crust. The interaction term was significant $(p \approx 0)$.
+  
+  The residuals	were fine, there were	no problems with normality and	no unduly influential	points. We have independence from taking a random sample.
+  
+  Our model is 
+    $size_i =\beta_0 +\beta_1\times store_i + \beta_2\times crust_i + \beta_3\times store_i\times crust_i + \epsilon_i$ where store=0 when the pizza was purchased from store A, and 1 for pizza purchased from store B, and $\epsilon_i \sim iid ~ N(0,\sigma^2)$.
+    
+  Our model explained 84.87% of variability in pizza's size.  
+  
+
+# Executive Summary
+  We are interested in find out whether a store actually made the larger pizzas than their rival's.
+
+  From the function summary2way, we can concluded that when the pizza has the same crust, store A actually make bigger pizzas than store B. When the crust level is mid, thick, thin, the diameter of the pizza purchased from store A is 2.03cm, 2.40cm, 0.75cm larger than pizza purchased from store B.
+  
+  Obviously, the type of crust is related to the size of the pizza $(p \approx 0)$.
+  
+  And from the function anova, the difference in pizza size between stores is depend on the crust type(the p-value of store:crust is nearly zero).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
