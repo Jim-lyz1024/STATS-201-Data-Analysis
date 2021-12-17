@@ -1,0 +1,66 @@
+---
+title: "STATS 201 Lab Class 4"
+author: LiYuzhuo-2019210146
+output:
+  word_document: default
+  pdf_document: default
+---
+
+# Code and output
+
+```{r}
+## Loading in the data.
+require(s20x)
+vote.df = read.table("vote-grouped.txt", header = TRUE)
+## Creating the proportion of senators who voted YES.
+vote.df$p = with(vote.df, yes/(yes+no)) 
+vote.df
+## Add variable p to the dataframe here.
+## Plot the data.
+## Making a plotting area.
+plot(p ~ contributions, type = "n", data = vote.df, ylim = c(0, 1),
+     xlab = "Contributions (tens of thousands of dollars)",
+     ylab = "Proportion voting YES")
+## Making some horizontal lines at the limits of the proportion.
+abline(h = c(0, 1), col = "lightgrey")
+## Plotting the data with each point representing the senator's party.
+text(p ~ contributions, labels = party, col = ifelse(party == "D", "blue", "red"), 
+     data = vote.df)
+## Analyse the data.
+vote.fit = glm(p ~ party * contributions, weight = yes + no, family = binomial, data = vote.df)
+anova(vote.fit, test = "Chisq")
+
+vote.fit2 = glm(p ~ party + contributions, weight = yes + no, family = binomial, data = vote.df)
+anova(vote.fit2, test = "Chisq")
+
+summary(vote.fit2)
+
+1- pchisq(6.56, 5)
+plot(vote.fit2, which = 1, lty = 2)
+
+exp(confint(vote.fit2))
+## INSERT CODE HERE.
+```
+
+# Methods and Assumption Checks
+
+As the response variable is the proportion of senators who voted YES on the bill, and two explanatory variable party(factor) and contributions(numeric). We have therefore fitted a generalized linear model with a binomial response distribution. 
+
+The plot of the proportion of senators who voted YES shows an obvious association with party and contributions, and without interaction between party and contributions. We fitted a logistic regression model to these data.
+
+And the check of residual deviance had p-value = 0.26, therefore we can trust the results from this binomial model.
+
+Our model is:
+
+
+# Executive Summary
+
+We are interested in determining if the amount of contributions from the automotive industry is related to the probability a senator votes YES on the bill. We have strong evidence that the amount of contributions from the automotive industry is related to the probability a senator votes YES on the bill$(p \approx 0)$.
+
+We are also interested to determine if senators from one party are more likely to vote YES on the bill than the other. We also have strong evidence to confirm the relation between the party of the senator and the willing to vote YES on the bill $(p \approx 0)$.
+
+But the effect of contributions doesn't depend on the political party, as our first fit including the interaction item of party and contributions, the summary shows p-value is 0.95.
+
+
+
+
