@@ -39,6 +39,13 @@ summary(vote.fit2)
 plot(vote.fit2, which = 1, lty = 2)
 
 exp(confint(vote.fit2))
+(exp(confint(vote.fit2))-1)*100
+
+vote.fit3 = glm(p ~ contributions, family = binomial, data = vote.df)
+vote.pred = predict(vote.fit3, newdata = data.frame(contributions = seq(0, 3, length.out = 1000)))
+lines(seq(0, 3, length.out = 1000), vote.pred)
+
+#vote.pred
 ## INSERT CODE HERE.
 ```
 
@@ -51,7 +58,9 @@ The plot of the proportion of senators who voted YES shows an obvious associatio
 And the check of residual deviance had p-value = 0.26, therefore we can trust the results from this binomial model.
 
 Our model is:
-
+    $log(Odds_i) = \beta_0 + \beta_1 \times Party_i + \beta_2 \times Contributions_i$
+  
+    Party is 1 when party is R, otherwise 0.
 
 # Executive Summary
 
@@ -61,6 +70,8 @@ We are also interested to determine if senators from one party are more likely t
 
 But the effect of contributions doesn't depend on the political party, as our first fit including the interaction item of party and contributions, the summary shows p-value is 0.95.
 
+We estimated the mean of p will increase between 31.1% and 300.7% by the original with $10000 contributions increased.
 
+Therefore, we can conclude that the amount of contributions from the automotive industry is related to the probability a senator votes YES on the bill and senators from Republican are more likely to vote YES than Democrat, and there is no evidence shows that the effect of contributions depend on the political party.
 
 
