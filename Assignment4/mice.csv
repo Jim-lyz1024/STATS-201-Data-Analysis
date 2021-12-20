@@ -1,0 +1,5 @@
+Treatment,Dose,Died,Survived,n,Propn
+Control,high,95,11,106,0.1037736
+Control,low,99,56,155,0.3612903
+Strep,high,57,49,106,0.4622642
+Strep,low,47,108,155,0.6967742
