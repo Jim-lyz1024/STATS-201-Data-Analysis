@@ -1,0 +1,23 @@
+Methods
+
+The number of R packages submitted to CRAN as the response is a count variable, so we choose the Poisson GLM. The year is a numeric predictor.
+
+We initially fitted a Poisson GLM. The residual deviance test indicated that the response was overdispersed (P-value < 0.05), so we refitted the model by quasipoisson. The residual plot revealed no concerns, since the data set is too small for the observed patterns to be meaningful.
+
+The trend of number of R packages submitted to CRAN with year was highly significant, so we kept the year predictor.
+
+The final model is log(μi) = beta0 + beta1 × yeari
+
+Where μi is the expected number of R packages submitted to CRAN in yeari. Yi is the number of R packages submitted to CRAN in yeari and has an overdispersed distribution with underlying mean μi. 
+
+
+
+Summary
+
+We wish to investigate the trend in the number of R packages submitted to CRAN over the years from 2005-2016 and predict the expected number of submissions in 2017.
+
+There was strong evidence of an increasing trend in the number of R packages submitted to CRAN (P-value < 0.05).
+
+We estimate the expected annual number of R packages submitted to CRAN increases by between 75% and 108% per year.
+
+We predict that the expected number of R packages submitted to CRAN in 2017 will be between 6627 and 10383.
